@@ -13,8 +13,6 @@ def validate_date(value: datetime.date):
             params={'date': value},
         )
 
-
-
 def validate_update_cords(user):
     valid_hours = datetime.datetime.now().hour - 2
     valid_datetime = datetime.datetime.now()
