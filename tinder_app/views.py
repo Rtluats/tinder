@@ -1,6 +1,7 @@
 import datetime
 
 from django.contrib.gis.geos import GEOSGeometry
+from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from rest_framework import generics
 from rest_framework import permissions
@@ -26,7 +27,7 @@ class UserListView(generics.ListAPIView):
 
     def get_queryset_by_distance(self):
         pk = self.request.user.pk
-        user = User.objects.get(pk=pk)
+        user = get_object_or_404(User, pk=pk)
         users_by_distance = User.objects.exclude(
             Q(user1_like_key=user) |
             Q(user2_like_key=user)
@@ -51,7 +52,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_update(self, serializer):
-        user = User.objects.get(pk=self.request.user.pk)
+        user = get_object_or_404(User, pk=self.request.user.pk)
 
         if user.block_disable is not None and user.block_disable <= datetime.datetime.now():
             if user.group.number_of_allowed_swipes != -1 and user.counter_swipes == user.group.number_of_allowed_swipes:
