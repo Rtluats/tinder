@@ -51,7 +51,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_update(self, serializer):
-        user = User.objects.get(pk=int(serializer.data["id"]))
+        user = User.objects.get(pk=int(self.request.user.pk))
 
         if user.block_disable is not None and user.block_disable <= datetime.datetime.now():
             if user.group.number_of_allowed_swipes != -1 and user.counter_swipes == user.group.number_of_allowed_swipes:
@@ -62,3 +62,5 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
                 user.save()
         elif user.block_disable is not None:
             raise ValidationError(f"user can't swipe until {user.block_disable}")
+
+        serializer.save()
