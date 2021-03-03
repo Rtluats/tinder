@@ -89,6 +89,7 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'Tinder.wsgi.application'
 
 # Database

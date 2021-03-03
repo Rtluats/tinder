@@ -20,11 +20,11 @@ class User(AbstractBaseUser):
     group = models.ForeignKey(UserGroup, on_delete=models.CASCADE)
     birth_date = models.DateField(validators=[validator.validate_date])
     counter_swipes = models.IntegerField(default=0)
-    block_disable = models.DateField(default=None)
+    block_disable = models.DateField(default=None, null=True)
     distance_look = models.IntegerField(default=-1)
     photo = models.ForeignKey(Photo, on_delete=models.CASCADE)
     cords = models.CharField(max_length=200)
-    last_cords_update = models.DateField(default=None)
+    last_cords_update = models.DateField(default=None, null=True)
 
     USERNAME_FIELD = "id"
 

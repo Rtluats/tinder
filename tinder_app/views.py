@@ -37,8 +37,7 @@ class UserListView(generics.ListAPIView):
             user1_like=True, user2_like=True
         )
 
-        return users_for_chat
-
+        return users_for_chat.order_by('message__date')
 
     def get_queryset_by_distance(self):
         pk = self.request.user.pk
