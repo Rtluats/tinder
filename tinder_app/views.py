@@ -21,9 +21,24 @@ class UserListView(generics.ListAPIView):
     def get_queryset(self):
         if 'get_by_distance' in self.request.query_params:
             queryset = self.get_queryset_by_distance()
+        elif 'get_users_for_chat' in self.request.query_params:
+            queryset = self.get_queryset_users_for_chat()
         else:
             queryset = User.objects.all()
         return queryset
+
+    def get_queryset_users_for_chat(self):
+        pk = self.request.user.pk
+        user = get_object_or_404(User, pk=pk)
+        users_for_chat = User.objects.filter(
+            Q(user1_like_key=user) |
+            Q(user2_like_key=user)
+        ).filter(
+            user1_like=True, user2_like=True
+        )
+
+        return users_for_chat
+
 
     def get_queryset_by_distance(self):
         pk = self.request.user.pk
