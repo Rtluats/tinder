@@ -8,9 +8,11 @@ from rest_framework import permissions
 from rest_framework.exceptions import ValidationError
 
 from tinder_app.models import (
-    User,
+    User, UserGroup, Photo, Like, Dislike, Message
 )
-from .serializers import UserSerializer
+from .serializers import (
+    UserSerializer, UserGroupSerializer, PhotoSerializer, LikeSerializer, DislikeSerializer, MessageSerializer
+    )
 
 
 class UserListView(generics.ListAPIView):
@@ -34,7 +36,8 @@ class UserListView(generics.ListAPIView):
             Q(user1_like_key=user) |
             Q(user2_like_key=user)
         ).filter(
-            user1_like=True, user2_like=True
+            user1_like=True,
+            user2_like=True
         )
 
         return users_for_chat.order_by('message__date')
@@ -80,3 +83,63 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
             raise ValidationError(f"user can't swipe until {user.block_disable}")
 
         serializer.save()
+
+
+class UserGroupListView(generics.ListAPIView):
+    queryset = UserGroup.objects.all()
+    serializer_class = UserGroupSerializer
+    permissions = [permissions.IsAuthenticated]
+
+
+class UserGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = UserGroup.objects.all()
+    serializer_class = UserGroupSerializer
+    permissions = [permissions.IsAuthenticated]
+
+
+class PhotoListView(generics.ListAPIView):
+    queryset = Photo.objects.all()
+    serializer_class = PhotoSerializer
+    permissions = [permissions.IsAuthenticated]
+
+
+class PhotoDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Photo.objects.all()
+    serializer_class = PhotoSerializer
+    permissions = [permissions.IsAuthenticated]
+
+
+class LikeListView(generics.ListAPIView):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    permissions = [permissions.IsAuthenticated]
+
+
+class LikeDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    permissions = [permissions.IsAuthenticated]
+
+
+class DislikeListView(generics.ListAPIView):
+    queryset = Dislike.objects.all()
+    serializer_class = DislikeSerializer
+    permissions = [permissions.IsAuthenticated]
+
+
+class DislikeDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Dislike.objects.all()
+    serializer_class = DislikeSerializer
+    permissions = [permissions.IsAuthenticated]
+
+
+class MessageListView(generics.ListAPIView):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    permissions = [permissions.IsAuthenticated]
+
+
+class MessageDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    permissions = [permissions.IsAuthenticated]
