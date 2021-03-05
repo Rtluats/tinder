@@ -74,6 +74,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
                 block = datetime.datetime.now()
                 block = block.replace(day=day)
                 user.block_disable = block
+                user.counter_swipes = 0
                 user.save()
         elif user.block_disable is not None:
             raise ValidationError(f"user can't swipe until {user.block_disable}")
