@@ -99,40 +99,45 @@ class UserView(viewsets.mixins.ListModelMixin,
         serializer.save()
 
 
-class UserGroupListView(generics.ListAPIView):
+class UserGroupView(viewsets.mixins.ListModelMixin,
+                    viewsets.mixins.RetrieveModelMixin,
+                    viewsets.mixins.CreateModelMixin,
+                    viewsets.GenericViewSet
+                    ):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
     permissions = [permissions.IsAuthenticated]
 
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
-class UserGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = UserGroup.objects.all()
-    serializer_class = UserGroupSerializer
-    permissions = [permissions.IsAuthenticated]
+    def get_object(self):
+        pk = self.request.query_params.get("pk", None)
+        return get_object_or_404(UserGroup, pk=pk)
 
-
-class PhotoListView(generics.ListAPIView):
+class PhotoView(generics.ListAPIView):
     queryset = Photo.objects.all()
     serializer_class = PhotoSerializer
     permissions = [permissions.IsAuthenticated]
 
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
-class PhotoDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Photo.objects.all()
-    serializer_class = PhotoSerializer
-    permissions = [permissions.IsAuthenticated]
-
+    def get_object(self):
+        pk = self.request.query_params.get("pk", None)
+        return get_object_or_404(Photo, pk=pk)
 
 class LikeListView(generics.ListAPIView):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
     permissions = [permissions.IsAuthenticated]
 
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
-class LikeDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Like.objects.all()
-    serializer_class = LikeSerializer
-    permissions = [permissions.IsAuthenticated]
+    def get_object(self):
+        pk = self.request.query_params.get("pk", None)
+        return get_object_or_404(Like, pk=pk)
 
 
 class DislikeListView(generics.ListAPIView):
@@ -140,11 +145,12 @@ class DislikeListView(generics.ListAPIView):
     serializer_class = DislikeSerializer
     permissions = [permissions.IsAuthenticated]
 
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
-class DislikeDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Dislike.objects.all()
-    serializer_class = DislikeSerializer
-    permissions = [permissions.IsAuthenticated]
+    def get_object(self):
+        pk = self.request.query_params.get("pk", None)
+        return get_object_or_404(Dislike, pk=pk)
 
 
 class MessageListView(generics.ListAPIView):
@@ -152,8 +158,9 @@ class MessageListView(generics.ListAPIView):
     serializer_class = MessageSerializer
     permissions = [permissions.IsAuthenticated]
 
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
-class MessageDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Message.objects.all()
-    serializer_class = MessageSerializer
-    permissions = [permissions.IsAuthenticated]
+    def get_object(self):
+        pk = self.request.query_params.get("pk", None)
+        return get_object_or_404(Message, pk=pk)
