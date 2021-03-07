@@ -1,11 +1,15 @@
 import datetime
+import django_filters.rest_framework
 
 from django.contrib.gis.geos import GEOSGeometry
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework.exceptions import ValidationError
+from rest_framework import filters
+
 
 from tinder_app.models import (
     User, UserGroup, Photo, Like, Dislike, Message
@@ -15,22 +19,19 @@ from .serializers import (
     )
 
 
-class UserListView(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+class UserFilter(filters.BaseFilterBackend):
 
-    def get_queryset(self):
-        if 'get_by_distance' in self.request.query_params:
-            queryset = self.get_queryset_by_distance()
-        elif 'get_users_for_chat' in self.request.query_params:
-            queryset = self.get_queryset_users_for_chat()
+    def filter_queryset(self, request, queryset, view):
+        if 'get_by_distance' in request.query_params:
+            queryset = self.get_queryset_by_distance(request)
+        elif 'get_users_for_chat' in request.query_params:
+            queryset = self.get_queryset_users_for_chat(request)
         else:
             queryset = User.objects.all()
         return queryset
 
-    def get_queryset_users_for_chat(self):
-        pk = self.request.user.pk
+    def get_queryset_users_for_chat(self, request):
+        pk = request.user.pk
         user = get_object_or_404(User, pk=pk)
         users_for_chat = User.objects.filter(
             Q(user1_like_key=user) |
@@ -42,8 +43,8 @@ class UserListView(generics.ListAPIView):
 
         return users_for_chat.order_by('message__date')
 
-    def get_queryset_by_distance(self):
-        pk = self.request.user.pk
+    def get_queryset_by_distance(self, request):
+        pk = request.user.pk
         user = get_object_or_404(User, pk=pk)
         users_by_distance = User.objects.exclude(
             Q(user1_like_key=user) |
@@ -63,10 +64,23 @@ class UserListView(generics.ListAPIView):
         return users_by_distance[:10]
 
 
-class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class UserView(viewsets.mixins.ListModelMixin,
+               viewsets.mixins.RetrieveModelMixin,
+               viewsets.mixins.CreateModelMixin,
+               viewsets.GenericViewSet
+               ):
     permission_classes = [permissions.IsAuthenticated]
+    queryset = User.objects.all()
+    serializer_classes = UserSerializer
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filter_class = UserFilter
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def get_object(self):
+        pk = self.request.query_params.get("pk", None)
+        return get_object_or_404(User, pk=pk)
 
     def perform_update(self, serializer):
         user = get_object_or_404(User, pk=self.request.user.pk)

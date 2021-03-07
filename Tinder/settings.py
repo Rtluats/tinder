@@ -40,11 +40,9 @@ INSTALLED_APPS = [
     'tinder_app.apps.TinderConfig',
 
     'rest_framework',
-
     'djoser',
-
     'rest_framework_simplejwt',
-
+    'django_filters',
 ]
 
 # rest_framework
@@ -54,6 +52,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'PAGE_SIZE': 10
 
 }
