@@ -19,16 +19,78 @@ from user_app.views import UserView
 from chat_app.views import MessageView
 from like_app.views import LikeView, DislikeView
 
+user_list = UserView.as_view({
+    'get': 'list',
+    'post': 'create',
+})
+
+user_detail = UserView.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
+message_list = MessageView.as_view({
+    'get': 'list',
+    'post': 'create',
+})
+
+message_detail = MessageView.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
+message_list = MessageView.as_view({
+    'get': 'list',
+    'post': 'create',
+})
+
+message_detail = MessageView.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
+likes_list = LikeView.as_view({
+    'get': 'list',
+    'post': 'create',
+})
+
+likes_detail = LikeView.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
+dislike_list = DislikeView.as_view({
+    'get': 'list',
+    'post': 'create',
+})
+
+dislike_detail = DislikeView.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
-    # надо настроить пути
-    path('users/', UserView.as_view()),
-    path('messages/', MessageView.as_view()),
-    path('likes/', LikeView.as_view()),
-    path('dislikes/', DislikeView.as_view()),
 
-
+    path('users/', user_list, name='user-list'),
+    path('user/<int:pk>/', user_list, name='user-detail'),
+    path('messages/', message_list, name='message-list'),
+    path('message/<int:pk>/', message_detail, name='message-detail'),
+    path('likes/', likes_list, name='likes-list'),
+    path('like/<int:pk>/', likes_detail, name='likes-detail'),
+    path('dislikes/', dislike_list, name='dislike-list'),
+    path('dislike/<int:pk>/', dislike_detail, name='dislike-detail'),
 ]
