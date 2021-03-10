@@ -15,14 +15,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from tinder_app.views import UserListView, UserDetailView
+from user_app.views import UserView
+from chat_app.views import MessageView
+from like_app.views import LikeView, DislikeView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
+    # надо настроить пути
+    path('users/', UserView.as_view()),
+    path('messages/', MessageView.as_view()),
+    path('likes/', LikeView.as_view()),
+    path('dislikes/', DislikeView.as_view()),
 
-    path('users/', UserListView.as_view()),
-    path('user/<int:pk>/', UserDetailView.as_view()),
+
 ]

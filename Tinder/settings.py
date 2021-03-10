@@ -37,7 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tinder_app.apps.TinderConfig',
+    'user_app.apps.TinderConfig',
+    'chat_app.apps.ChatAppConfig',
+    'like_app.apps.LikeAppConfig',
 
     'rest_framework',
     'djoser',
@@ -67,7 +69,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-AUTH_USER_MODEL = "tinder_app.User"
+AUTH_USER_MODEL = "user_app.User"
 
 ROOT_URLCONF = 'Tinder.urls'
 

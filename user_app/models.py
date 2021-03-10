@@ -74,22 +74,3 @@ class User(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
-
-
-class Like(models.Model):
-    user1_like_key = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user1_like_key")
-    user2_like_key = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2_like_key")
-    user1_like = models.BooleanField(default=False)
-    user2_like = models.BooleanField(default=False)
-
-
-class Dislike(models.Model):
-    user1_dislike_key = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user1_dislike_key")
-    user2_dislike_key = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user2_dislike_key")
-
-
-class Message(models.Model):
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="from_user")
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="to_user")
-    date = models.DateTimeField(auto_now_add=True)
-    text = models.TextField()

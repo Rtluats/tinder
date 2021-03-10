@@ -2,7 +2,7 @@ import pytest
 import datetime
 from rest_framework.reverse import reverse
 
-from tinder_app.models import User
+from user_app.models import User
 
 
 @pytest.mark.django_db

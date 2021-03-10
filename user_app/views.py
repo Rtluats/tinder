@@ -4,6 +4,7 @@ import django_filters.rest_framework
 from django.contrib.gis.geos import GEOSGeometry
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+
 from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework import permissions
@@ -11,11 +12,11 @@ from rest_framework.exceptions import ValidationError
 from rest_framework import filters
 
 
-from tinder_app.models import (
-    User, UserGroup, Photo, Like, Dislike, Message
+from user_app.models import (
+    User, UserGroup, Photo,
 )
 from .serializers import (
-    UserSerializer, UserGroupSerializer, PhotoSerializer, LikeSerializer, DislikeSerializer, MessageSerializer
+    UserSerializer, UserGroupSerializer, PhotoSerializer,
     )
 
 
@@ -67,6 +68,8 @@ class UserFilter(filters.BaseFilterBackend):
 class UserView(viewsets.mixins.ListModelMixin,
                viewsets.mixins.RetrieveModelMixin,
                viewsets.mixins.CreateModelMixin,
+               viewsets.mixins.DestroyModelMixin,
+               viewsets.mixins.UpdateModelMixin,
                viewsets.GenericViewSet
                ):
     permission_classes = [permissions.IsAuthenticated]
@@ -115,6 +118,7 @@ class UserGroupView(viewsets.mixins.ListModelMixin,
         pk = self.request.query_params.get("pk", None)
         return get_object_or_404(UserGroup, pk=pk)
 
+
 class PhotoView(generics.ListAPIView):
     queryset = Photo.objects.all()
     serializer_class = PhotoSerializer
@@ -126,41 +130,3 @@ class PhotoView(generics.ListAPIView):
     def get_object(self):
         pk = self.request.query_params.get("pk", None)
         return get_object_or_404(Photo, pk=pk)
-
-class LikeListView(generics.ListAPIView):
-    queryset = Like.objects.all()
-    serializer_class = LikeSerializer
-    permissions = [permissions.IsAuthenticated]
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def get_object(self):
-        pk = self.request.query_params.get("pk", None)
-        return get_object_or_404(Like, pk=pk)
-
-
-class DislikeListView(generics.ListAPIView):
-    queryset = Dislike.objects.all()
-    serializer_class = DislikeSerializer
-    permissions = [permissions.IsAuthenticated]
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def get_object(self):
-        pk = self.request.query_params.get("pk", None)
-        return get_object_or_404(Dislike, pk=pk)
-
-
-class MessageListView(generics.ListAPIView):
-    queryset = Message.objects.all()
-    serializer_class = MessageSerializer
-    permissions = [permissions.IsAuthenticated]
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def get_object(self):
-        pk = self.request.query_params.get("pk", None)
-        return get_object_or_404(Message, pk=pk)
