@@ -1,7 +1,10 @@
+import logging
 import uuid
 
 import pytest
 import datetime
+
+from django.http import QueryDict
 from rest_framework.reverse import reverse
 
 from user_app.models import User, UserGroup
@@ -80,14 +83,28 @@ def test_view_get_list(client, create_user):
 
 
 @pytest.mark.django_db
-def test_view_get_by_distance(client, create_user, create_groups):
+def test_view_get_by_distance(api_client, create_user, create_groups):
     groups = create_groups()
-    user1 = create_user(group=groups[0])
-    user2 = create_user(group=groups[1])
-    user3 = create_user(group=groups[2])
+    user1 = create_user()
+    user2 = create_user()
+    user3 = create_user()
+    user1.group = groups[0]
+    user2.group = groups[1]
+    user3.group = groups[2]
+    user3.distance_look = -1
+    user1.save()
+    user2.save()
+    user3.save()
 
-    client.force_login(user1)
+    api_client.force_login(user3)
 
-    response = client.get(reverse('user-list'))
+    url = reverse('user-list')
 
-    assert len(response.data['results']) == 3
+    data = {
+        'pk': user3.pk,
+        'get_by_distance': True
+    }
+
+    response = api_client.get(url, data=data)
+
+    assert len(response.data) == 2
