@@ -39,22 +39,35 @@ def test_user_create(create_user):
 
 
 @pytest.mark.django_db
-def test_view_non_auth(client):
+def test_view(client):
     url = reverse('user-list')
     response = client.get(url)
     assert response.status_code == 200
 
 
-# @pytest.mark.django_db
-# def test_view_auth(client):
-#     date = datetime.date.today()
-#     user = User.objects.create(name='John', email='user@email.com', password='password', birth_date=date.replace(year=2002))
-#     User.objects.create(name='John2', email='user2@email.com', password='password2', birth_date=date.replace(year=2001)).save()
-#     User.objects.create(name='John3', email='user3@email.com', password='password3', birth_date=date.replace(year=2000)).save()
-#     user.save()
-#     url = "/auth/"
-#     client.force_login(user)
-#
-#     response = client.get(reverse('user-list'))
-#
-#     assert response.status_code == 200
+@pytest.mark.django_db
+def test_view_get_list(client):
+    date = datetime.date.today()
+    user = User.objects.create(name='John', email='user@email.com', password='password', birth_date=date.replace(year=2002))
+    User.objects.create(name='John2', email='user2@email.com', password='password2', birth_date=date.replace(year=2001))
+    User.objects.create(name='John3', email='user3@email.com', password='password3', birth_date=date.replace(year=2000))
+
+    client.force_login(user)
+
+    response = client.get(reverse('user-list'))
+
+    assert len(response.data['results']) == 3
+
+
+@pytest.mark.django_db
+def test_view_auth(client):
+    date = datetime.date.today()
+    user = User.objects.create(name='John', email='user@email.com', password='password', birth_date=date.replace(year=2002))
+    User.objects.create(name='John2', email='user2@email.com', password='password2', birth_date=date.replace(year=2001))
+    User.objects.create(name='John3', email='user3@email.com', password='password3', birth_date=date.replace(year=2000))
+
+    client.force_login(user)
+
+    response = client.get(reverse('user-list'))
+
+    assert len(response.data['results']) == 3

@@ -100,6 +100,9 @@ class UserView(viewsets.mixins.ListModelMixin,
 
         serializer.save()
 
+    class Meta:
+        ordering = ['-id']
+
 
 class UserGroupView(viewsets.mixins.ListModelMixin,
                     viewsets.mixins.RetrieveModelMixin,
