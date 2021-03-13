@@ -4,7 +4,7 @@ import pytest
 import datetime
 from rest_framework.reverse import reverse
 
-from user_app.models import User
+from user_app.models import User, UserGroup
 
 
 @pytest.fixture
@@ -31,9 +31,30 @@ def create_user(db, django_user_model, test_password):
    return make_user
 
 
+@pytest.fixture
+def create_groups(db, django_user_model):
+    def make_groups(**kwargs):
+        default_group = UserGroup.objects.create(
+            number_of_allowed_swipes=20,
+            allowed_distance=10_000,
+            group_name="стандартная"
+        )
+        vip_group = UserGroup.objects.create(
+            number_of_allowed_swipes=100,
+            allowed_distance=25_000,
+            group_name="вип"
+        )
+        premium_group = UserGroup.objects.create(
+            number_of_allowed_swipes=-1,
+            allowed_distance=-1,
+            group_name="премиум"
+        )
+        return [default_group, vip_group, premium_group]
+    return make_groups
+
+
 @pytest.mark.django_db
 def test_user_create(create_user):
-    date = datetime.date.today()
     create_user()
     assert User.objects.count() == 1
 
@@ -46,11 +67,10 @@ def test_view(client):
 
 
 @pytest.mark.django_db
-def test_view_get_list(client):
-    date = datetime.date.today()
-    user = User.objects.create(name='John', email='user@email.com', password='password', birth_date=date.replace(year=2002))
-    User.objects.create(name='John2', email='user2@email.com', password='password2', birth_date=date.replace(year=2001))
-    User.objects.create(name='John3', email='user3@email.com', password='password3', birth_date=date.replace(year=2000))
+def test_view_get_list(client, create_user):
+    user = create_user()
+    create_user()
+    create_user()
 
     client.force_login(user)
 
@@ -60,13 +80,13 @@ def test_view_get_list(client):
 
 
 @pytest.mark.django_db
-def test_view_auth(client):
-    date = datetime.date.today()
-    user = User.objects.create(name='John', email='user@email.com', password='password', birth_date=date.replace(year=2002))
-    User.objects.create(name='John2', email='user2@email.com', password='password2', birth_date=date.replace(year=2001))
-    User.objects.create(name='John3', email='user3@email.com', password='password3', birth_date=date.replace(year=2000))
+def test_view_get_by_distance(client, create_user, create_groups):
+    groups = create_groups()
+    user1 = create_user(group=groups[0])
+    user2 = create_user(group=groups[1])
+    user3 = create_user(group=groups[2])
 
-    client.force_login(user)
+    client.force_login(user1)
 
     response = client.get(reverse('user-list'))
 

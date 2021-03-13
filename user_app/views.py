@@ -7,7 +7,6 @@ from django.db.models import Q
 
 from rest_framework import viewsets
 from rest_framework import generics
-from rest_framework import permissions
 from rest_framework.exceptions import ValidationError
 from rest_framework import filters
 
@@ -99,9 +98,6 @@ class UserView(viewsets.mixins.ListModelMixin,
             raise ValidationError(f"user can't swipe until {user.block_disable}")
 
         serializer.save()
-
-    class Meta:
-        ordering = ['-id']
 
 
 class UserGroupView(viewsets.mixins.ListModelMixin,
