@@ -72,11 +72,10 @@ class UserView(viewsets.mixins.ListModelMixin,
                viewsets.mixins.UpdateModelMixin,
                viewsets.GenericViewSet
                ):
-    permission_classes = [permissions.IsAuthenticated]
+
     queryset = User.objects.all()
-    serializer_classes = UserSerializer
-    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
-    filter_class = UserFilter
+    serializer_class = UserSerializer
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend, UserFilter]
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -109,7 +108,7 @@ class UserGroupView(viewsets.mixins.ListModelMixin,
                     ):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
-    permissions = [permissions.IsAuthenticated]
+
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -122,7 +121,7 @@ class UserGroupView(viewsets.mixins.ListModelMixin,
 class PhotoView(generics.ListAPIView):
     queryset = Photo.objects.all()
     serializer_class = PhotoSerializer
-    permissions = [permissions.IsAuthenticated]
+
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
