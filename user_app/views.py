@@ -40,10 +40,12 @@ class UserFilter(filters.BaseFilterBackend):
             Q(user2_like_key=user.pk)
         ).filter(
             user1_like_key__user1_like=True,
-            user2_like_key__user2_like=True
+            user1_like_key__user2_like=True
+        ).exclude(
+            id=user.pk
         )
 
-        return users_for_chat.order_by("from_user__date")
+        return users_for_chat.all()
 
     def get_queryset_by_distance(self, request):
         pk = request.user.pk
