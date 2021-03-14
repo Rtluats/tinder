@@ -8,6 +8,7 @@ from django.http import QueryDict
 from rest_framework.reverse import reverse
 
 from user_app.models import User, UserGroup
+from like_app.models import Like, Dislike
 
 
 @pytest.fixture
@@ -108,3 +109,28 @@ def test_view_get_by_distance(api_client, create_user, create_groups):
     response = api_client.get(url, data=data)
 
     assert len(response.data) == 2
+
+
+@pytest.mark.django_db
+def test_view_get_users_for_chat(api_client, create_user, create_groups):
+
+    user1 = create_user()
+    user2 = create_user()
+    user3 = create_user()
+
+    Like.objects.create(user1_like_key=user1, user2_like_key=user3, user1_like=True, user2_like=True)
+    Dislike.objects.create(user1_dislike_key=user2, user2_like_key=user3)
+
+    api_client.force_login(user3)
+
+    url = reverse('user-list')
+
+    data = {
+        'pk': user3.pk,
+        'get_users_for_chat': True
+    }
+
+    response = api_client.get(url, data=data)
+
+    assert len(response.data) == 1
+
