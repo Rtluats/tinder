@@ -114,10 +114,11 @@ def test_view_get_by_distance(api_client, create_user, create_groups):
 @pytest.mark.django_db
 def test_view_get_users_for_chat(api_client, create_user):
     user1 = create_user()
-    create_user()
+    create_user().save()
     user3 = create_user()
-
-    Like.objects.create(user1_like_key=user3, user2_like_key=user1, user1_like=True, user2_like=True)
+    user3.save()
+    user1.save()
+    Like.objects.create(user1_like_key=user3, user2_like_key=user1, user1_like=True, user2_like=True).save()
 
     api_client.force_authenticate(user3)
 
