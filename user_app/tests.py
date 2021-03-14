@@ -64,21 +64,21 @@ def test_user_create(create_user):
 
 
 @pytest.mark.django_db
-def test_view(client):
+def test_view(api_client):
     url = reverse('user-list')
-    response = client.get(url)
-    assert response.status_code == 200
+    response = api_client.get(url)
+    assert response.status_code == 401
 
 
 @pytest.mark.django_db
-def test_view_get_list(client, create_user):
+def test_view_get_list(api_client, create_user):
     user = create_user()
     create_user()
     create_user()
 
-    client.force_login(user)
+    api_client.force_authenticate(user=user)
 
-    response = client.get(reverse('user-list'))
+    response = api_client.get(reverse('user-list'))
 
     assert len(response.data['results']) == 3
 
@@ -97,7 +97,7 @@ def test_view_get_by_distance(api_client, create_user, create_groups):
     user2.save()
     user3.save()
 
-    api_client.force_login(user3)
+    api_client.force_authenticate(user=user3)
 
     url = reverse('user-list')
 
@@ -108,19 +108,19 @@ def test_view_get_by_distance(api_client, create_user, create_groups):
 
     response = api_client.get(url, data=data)
 
-    assert len(response.data) == 2
+    assert len(response.data['results']) == 2
 
 
 @pytest.mark.django_db
-def test_view_get_users_for_chat(api_client, create_user, create_groups):
+def test_view_get_users_for_chat(api_client, create_user):
     user1 = create_user()
     user2 = create_user()
     user3 = create_user()
 
     Like.objects.create(user1_like_key=user1, user2_like_key=user3, user1_like=True, user2_like=True)
-    Dislike.objects.create(user1_dislike_key=user2, user2_like_key=user3)
+    Dislike.objects.create(user1_dislike_key=user2, user2_dislike_key=user3)
 
-    api_client.force_login(user3)
+    api_client.force_authenticate(user3)
 
     url = reverse('user-list')
 
@@ -131,4 +131,4 @@ def test_view_get_users_for_chat(api_client, create_user, create_groups):
 
     response = api_client.get(url, data=data)
 
-    assert len(response.data) == 1
+    assert len(response.data['results']) == 1

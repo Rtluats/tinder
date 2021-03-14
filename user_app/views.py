@@ -5,10 +5,12 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
+
 from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
 from rest_framework import filters
+from rest_framework.permissions import IsAuthenticated
 
 
 from user_app.models import (
@@ -34,24 +36,26 @@ class UserFilter(filters.BaseFilterBackend):
         pk = request.user.pk
         user = get_object_or_404(User, pk=pk)
         users_for_chat = User.objects.filter(
-            Q(user1_like_key=user) |
-            Q(user2_like_key=user)
+            Q(user1_like_key=user.pk) |
+            Q(user2_like_key=user.pk)
         ).filter(
-            user1_like=True,
-            user2_like=True
+            user1_like_key__user1_like=True,
+            user2_like_key__user2_like=True
         )
 
-        return users_for_chat.order_by('message__date')
+        return users_for_chat.order_by("from_user__date")
 
     def get_queryset_by_distance(self, request):
         pk = request.user.pk
         user = get_object_or_404(User, pk=pk)
         users_by_distance = User.objects.exclude(
-            Q(user1_like_key=user) |
-            Q(user2_like_key=user)
+            Q(user1_like_key=user.pk) |
+            Q(user2_like_key=user.pk)
         ).exclude(
-            Q(user1_dislike_key=user) |
-            Q(user2_dislike_key=user)
+            Q(user1_dislike_key=user.pk) |
+            Q(user2_dislike_key=user.pk)
+        ).exclude(
+            id=user.pk
         )
 
         if user.distance_look != -1:
@@ -71,7 +75,7 @@ class UserView(viewsets.mixins.ListModelMixin,
                viewsets.mixins.UpdateModelMixin,
                viewsets.GenericViewSet
                ):
-
+    permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend, UserFilter]
@@ -107,6 +111,7 @@ class UserGroupView(viewsets.mixins.ListModelMixin,
                     ):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
+    permission_classes = [IsAuthenticated]
 
 
     def get(self, request, *args, **kwargs):
