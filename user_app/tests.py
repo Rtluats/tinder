@@ -1,10 +1,8 @@
-import logging
 import uuid
 
 import pytest
 import datetime
 
-from django.http import QueryDict
 from rest_framework.reverse import reverse
 
 from user_app.models import User, UserGroup
@@ -19,20 +17,21 @@ def api_client():
 
 @pytest.fixture
 def test_password():
-   return 'strong-test-pass'
+    return 'strong-test-pass'
 
 
 @pytest.fixture
 def create_user(db, django_user_model, test_password):
-   def make_user(**kwargs):
-       date = datetime.date.today()
-       kwargs['password'] = test_password
-       kwargs['name'] = 'John'
-       kwargs['birth_date'] = date.replace(year=2002)
-       if 'email' not in kwargs:
-           kwargs['email'] = str(uuid.uuid4()) + '@gmail.com'
-       return django_user_model.objects.create_user(**kwargs)
-   return make_user
+    def make_user(**kwargs):
+        date = datetime.date.today()
+        kwargs['password'] = test_password
+        kwargs['name'] = 'John'
+        kwargs['birth_date'] = date.replace(year=2002)
+        if 'email' not in kwargs:
+            kwargs['email'] = str(uuid.uuid4()) + '@gmail.com'
+        return django_user_model.objects.create_user(**kwargs)
+
+    return make_user
 
 
 @pytest.fixture
@@ -54,6 +53,7 @@ def create_groups(db, django_user_model):
             group_name="премиум"
         )
         return [default_group, vip_group, premium_group]
+
     return make_groups
 
 
@@ -113,7 +113,6 @@ def test_view_get_by_distance(api_client, create_user, create_groups):
 
 @pytest.mark.django_db
 def test_view_get_users_for_chat(api_client, create_user, create_groups):
-
     user1 = create_user()
     user2 = create_user()
     user3 = create_user()
@@ -133,4 +132,3 @@ def test_view_get_users_for_chat(api_client, create_user, create_groups):
     response = api_client.get(url, data=data)
 
     assert len(response.data) == 1
-
