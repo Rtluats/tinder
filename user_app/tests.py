@@ -6,7 +6,7 @@ import datetime
 from rest_framework.reverse import reverse
 
 from user_app.models import User, UserGroup
-from like_app.models import Like, Dislike
+from like_app.models import Like
 
 
 @pytest.fixture
@@ -120,7 +120,7 @@ def test_view_get_users_for_chat(api_client, create_user):
     user1.save()
     Like.objects.create(user1_like_key=user3, user2_like_key=user1, user1_like=True, user2_like=True).save()
 
-    api_client.force_authenticate(user3)
+    api_client.force_authenticate(user=user3)
 
     url = reverse('user-list')
 
@@ -132,3 +132,28 @@ def test_view_get_users_for_chat(api_client, create_user):
     response = api_client.get(url, data=data)
 
     assert len(response.data['results']) == 1
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'birth_date, status_code', [
+        (datetime.date(2012, 2, 2), 404),
+        (datetime.date(2013, 3, 5), 404),
+        (datetime.date(2003, 6, 6), 200),
+        (datetime.date(2007, 5, 5), 404),
+    ]
+)
+def test_data_validation(
+        birth_date, status_code, api_client, create_user
+):
+    user = create_user()
+    user.save()
+    url = reverse('user-detail', args=(user.pk,))
+    api_client.force_authenticate(user=user)
+
+    data = {
+        'pk': user.pk,
+        'birth_date': birth_date,
+    }
+    response = api_client.patch(url, data=data)
+    assert response.status_code == status_code

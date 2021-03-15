@@ -19,6 +19,7 @@ from user_app.views import UserView
 from chat_app.views import MessageView
 from like_app.views import LikeView, DislikeView
 
+
 user_list = UserView.as_view({
     'get': 'list',
     'post': 'create',
@@ -43,17 +44,6 @@ message_detail = MessageView.as_view({
     'delete': 'destroy'
 })
 
-message_list = MessageView.as_view({
-    'get': 'list',
-    'post': 'create',
-})
-
-message_detail = MessageView.as_view({
-    'get': 'retrieve',
-    'put': 'update',
-    'patch': 'partial_update',
-    'delete': 'destroy'
-})
 
 likes_list = LikeView.as_view({
     'get': 'list',
@@ -86,7 +76,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')),
 
     path('users/', user_list, name='user-list'),
-    path('user/<int:pk>/', user_list, name='user-detail'),
+    path('user/<int:pk>/', user_detail, name='user-detail'),
     path('messages/', message_list, name='message-list'),
     path('message/<int:pk>/', message_detail, name='message-detail'),
     path('likes/', likes_list, name='likes-list'),

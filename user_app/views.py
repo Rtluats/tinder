@@ -5,20 +5,18 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
-
 from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
 
-
 from user_app.models import (
     User, UserGroup, Photo,
 )
 from .serializers import (
     UserSerializer, UserGroupSerializer, PhotoSerializer,
-    )
+)
 
 
 class UserFilter(filters.BaseFilterBackend):
@@ -35,17 +33,17 @@ class UserFilter(filters.BaseFilterBackend):
     def get_queryset_users_for_chat(self, request):
         pk = request.user.pk
         user = get_object_or_404(User, pk=pk)
-        users_for_chat = User.objects.filter(
+        users_for_chat = User.objects.exclude(
+            id=user.pk
+        ).filter(
             Q(user1_like_key=user.pk) |
             Q(user2_like_key=user.pk)
-        ).filter(
-            user1_like_key__user1_like=True,
-            user1_like_key__user2_like=True
         ).exclude(
-            id=user.pk
+            Q(user1_like_key__user1_like=False) |
+            Q(user1_like_key__user2_like=False)
         )
 
-        return users_for_chat.all()
+        return users_for_chat
 
     def get_queryset_by_distance(self, request):
         pk = request.user.pk
@@ -115,7 +113,6 @@ class UserGroupView(viewsets.mixins.ListModelMixin,
     serializer_class = UserGroupSerializer
     permission_classes = [IsAuthenticated]
 
-
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
@@ -127,7 +124,6 @@ class UserGroupView(viewsets.mixins.ListModelMixin,
 class PhotoView(generics.ListAPIView):
     queryset = Photo.objects.all()
     serializer_class = PhotoSerializer
-
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
